@@ -38,7 +38,7 @@ class RunEnvTest(parameterized.TestCase, test.TestCase):
   def testPolicyRun(self, tag, use_root_dir):
     env = grasping_env.KukaGraspingProceduralEnv(
         downsample_width=48, downsample_height=48,
-        continuous=True, remove_height_hack=True, render_mode='DIRECT')
+        continuous=True, remove_height_hack=True, render_mode='GUI')
     policy = policies.RandomGraspingPolicyD4()
     root_dir = os.path.join(FLAGS.test_tmpdir, tag) if use_root_dir else None
     run_env.run_env(env,
