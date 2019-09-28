@@ -50,7 +50,7 @@ class RunEnvTest(parameterized.TestCase, test.TestCase):
                     tag=tag,
                     task=0,
                     global_step=0,
-                    num_episodes=1)
+                    num_episodes=10)
 
 if __name__ == '__main__':
   test.main()
