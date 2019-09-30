@@ -202,17 +202,41 @@ class KukaGraspingProceduralEnv(gym.Env):
         timeStep=self._time_step,
         clientId=self.cid)
     self._block_uids = []
-    for urdf_name in self._urdf_list:
-      xpos = 0.4 + self._block_random * random.random()
-      ypos = self._block_random * (random.random() - .5)
-      angle = np.pi / 2 + self._block_random * np.pi * random.random()
-      ori = pybullet.getQuaternionFromEuler([0, 0, angle])
-      uid = pybullet.loadURDF(
-          urdf_name, [xpos, ypos, .15], [ori[0], ori[1], ori[2], ori[3]],
-          physicsClientId=self.cid)
-      self._block_uids.append(uid)
-      for _ in range(500):
-        pybullet.stepSimulation(physicsClientId=self.cid)
+    self._urdf_list = [
+      ('/home/jonathan/Desktop/Projects/objects/6a0c8c43b13693fa46eb89c2e933753d.obj', 'obj', [4, 4, 4]), 
+      ('/home/jonathan/Desktop/Projects/objects/6aec84952a5ffcf33f60d03e1cb068dc.obj', 'obj', [2, 2, 2]),
+      ('/home/jonathan/Desktop/Projects/objects/bed29baf625ce9145b68309557f3a78c.obj', 'obj', [2, 2, 2]), 
+      ('/home/jonathan/Desktop/Projects/objects/dac6ea4929f1e47f178d703a993fe24c.obj', 'obj', [2, 2, 2]), 
+      ('/home/jonathan/Desktop/Projects/objects/f452c1053f88cd2fc21f7907838a35d1.obj', 'obj', [2, 2, 2])]
+    for name in self._urdf_list:
+      if(name[1] == 'urdf'):
+          print(name[0], name[1])
+          urdf_name = name[0]
+          xpos = 0.4 + self._block_random * random.random()
+          ypos = self._block_random * (random.random() - .5)
+          angle = np.pi / 2 + self._block_random * np.pi * random.random()
+          ori = pybullet.getQuaternionFromEuler([0, 0, angle])
+          uid = pybullet.loadURDF(
+              urdf_name, [xpos, ypos, .15], [ori[0], ori[1], ori[2], ori[3]],
+              physicsClientId=self.cid)
+          self._block_uids.append(uid)
+          for _ in range(500):
+            pybullet.stepSimulation(physicsClientId=self.cid)
+      if(name[1] == 'obj'):
+          obj_name = name[0]
+          scale = name[2]
+          xpos = 0.4 + self._block_random * random.random()
+          ypos = self._block_random * (random.random() - .5)
+          angle = np.pi / 2 + self._block_random * np.pi * random.random()
+          ori = pybullet.getQuaternionFromEuler([0, 0, angle])
+          uid = pybullet.createMultiBody(
+              0.05, pybullet.createCollisionShape(pybullet.GEOM_MESH, fileName=name[0], meshScale=scale), 
+              pybullet.createVisualShape(pybullet.GEOM_MESH, fileName=name[0], meshScale=scale),
+              [xpos, ypos, .15], [ori[0], ori[1], ori[2], ori[3]], 
+              physicsClientId=self.cid)
+          self._block_uids.append(uid)
+          for _ in range(500):
+            pybullet.stepSimulation(physicsClientId=self.cid)
 
   def reset(self):
     self._resets += 1
@@ -236,7 +260,7 @@ class KukaGraspingProceduralEnv(gym.Env):
         fov, aspect, near, far)
     self._env_step = 0
 
-    for i in range(len(self._urdf_list)):
+    for i in range(len(self._block_uids)):
       xpos = 0.4 + self._block_random * random.random()
       ypos = self._block_random * (random.random() - .5)
       # random angle
@@ -438,7 +462,7 @@ class KukaGraspingProceduralEnv(gym.Env):
         np.arange(total_num_objects), num_objects, replace=replace)
     selected_objects_filenames = []
     for object_index in selected_objects:
-      selected_objects_filenames += [found_object_directories[object_index]]
+      selected_objects_filenames += [(found_object_directories[object_index], 'urdf')]
     logging.info('selected_objects_filenames %s', selected_objects_filenames)
     return selected_objects_filenames
 
